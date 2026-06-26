@@ -4,6 +4,7 @@
     <div v-if="loading" class="loading-center"><div class="spinner"></div></div>
     <div v-else-if="items.length === 0" style="text-align:center; padding:60px 20px;">
       <p style="font-size:1.5rem; margin-bottom:20px; color:var(--text-light);">❤️ Wishlist is empty</p>
+      <p v-if="rawData" style="font-size:0.9rem; color:#666; margin-top:10px;">Debug: {{ rawData }}</p>
       <router-link to="/products" class="btn btn-primary">Discover Products</router-link>
     </div>
       <div v-else class="product-grid">
@@ -36,14 +37,35 @@ import cartService from '../services/cart'
 
 const store   = useStore()
 const items   = ref([])
+const rawData = ref(null)
 const loading = ref(true)
 
 onMounted(async () => {
   try {
+    // Refresh wishlist count first
+    await store.dispatch('fetchWishlistCount')
+    
+    console.log('Fetching wishlist items...')
     const { data } = await wishlistService.getAll()
-    items.value   = data
+    console.log('Wishlist data received:', data)
+    console.log('Data type:', typeof data)
+    console.log('Is array:', Array.isArray(data))
+    rawData.value = JSON.stringify(data)
+    
+    // Ensure data is an array
+    if (Array.isArray(data)) {
+      items.value = data
+    } else if (data && typeof data === 'object') {
+      // If it's an object, try to get the data property
+      items.value = data.data || [data]
+    } else {
+      items.value = []
+    }
   } catch (error) {
     console.error('Error fetching wishlist:', error)
+    console.error('Error response:', error.response?.data)
+    console.error('Error status:', error.response?.status)
+    items.value = []
   } finally {
     loading.value = false
   }

@@ -29,7 +29,12 @@
       <h2 class="section-title">Featured Products</h2>
       <div v-if="loading" class="loading-center"><div class="spinner"></div></div>
       <div v-else class="product-grid">
-        <ProductCard v-for="p in products" :key="p.id" :product="p" />
+        <ProductCard 
+          v-for="p in products" 
+          :key="p.id" 
+          :product="p"
+          @view="viewProduct"
+        />
       </div>
       <div class="text-center" style="margin-top:28px">
         <router-link to="/products" class="btn btn-outline">View Products</router-link>
@@ -40,11 +45,18 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import axios from 'axios'
 import ProductCard from '../components/ProductCard.vue'
 const products   = ref([])
 const categories = ref([])
 const loading    = ref(true)
+const router     = useRouter()
+
+const viewProduct = (id) => {
+  router.push(`/products/${id}`)
+}
+
 onMounted(async () => {
   const [p, c] = await Promise.all([axios.get('/products?per_page=8'), axios.get('/categories')])
   products.value   = p.data.data
@@ -106,7 +118,12 @@ onMounted(async () => {
         <template v-else>
           <p class="results-count">{{ pagination.total }} products found</p>
           <div class="product-grid">
-            <ProductCard v-for="p in products" :key="p.id" :product="p" />
+            <ProductCard 
+              v-for="p in products" 
+              :key="p.id" 
+              :product="p"
+              @view="viewProduct"
+            />
           </div>
           <!-- Pagination -->
           <div class="pagination" v-if="pagination.last_page > 1">

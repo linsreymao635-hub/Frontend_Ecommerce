@@ -10,7 +10,12 @@
     <div class="container" style="padding: 40px 20px;">
       <div v-if="loading" class="loading-center"><div class="spinner"></div></div>
       <div v-else class="product-grid">
-        <ProductCard v-for="p in products" :key="p.id" :product="p" />
+        <ProductCard 
+          v-for="p in products" 
+          :key="p.id" 
+          :product="p"
+          @view="viewProduct"
+        />
       </div>
       <div v-if="!loading && products.length === 0" class="text-center py-12 text-gray-500">
         <i class="fas fa-box-open text-5xl mb-3 text-gray-300"></i>
@@ -21,6 +26,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import ProductCard from '../components/ProductCard.vue'
 import productsService from '../services/products'
 import categoriesService from '../services/categories'
@@ -28,6 +34,7 @@ import categoriesService from '../services/categories'
 const products   = ref([])
 const categories = ref([])
 const loading    = ref(true)
+const router     = useRouter()
 
 onMounted(async () => {
   try {
@@ -43,6 +50,10 @@ onMounted(async () => {
     loading.value = false
   }
 })
+
+const viewProduct = (id) => {
+  router.push(`/products/${id}`)
+}
 </script>
 
 <style scoped>
