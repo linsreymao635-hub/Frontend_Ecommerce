@@ -10,7 +10,10 @@ export default {
   },
   
   logout() {
-    return api.post('/logout')
+    return api.post('/logout').catch(() => {
+      // Even if logout fails on server, we still want to clear local data
+      return Promise.resolve()
+    })
   },
   
   getProfile() {

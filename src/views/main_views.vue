@@ -138,14 +138,16 @@ onMounted(async () => {
 
 <script setup>
 import { ref, onMounted, reactive } from 'vue'
+import { useRoute } from 'vue-router'
 import axios from 'axios'
 import ProductCard from '../components/ProductCard.vue'
-const products   = ref([])
-const categories = ref([])
-const loading    = ref(true)
-const filters    = reactive({ category_id: '', search: '', min_price: '', max_price: '' })
-const pagination = ref({})
-let searchTimer  = null
+const route       = useRoute()
+const products    = ref([])
+const categories  = ref([])
+const loading     = ref(true)
+const filters     = reactive({ category_id: '', search: '', min_price: '', max_price: '' })
+const pagination  = ref({})
+let searchTimer   = null
 
 const fetchProducts = async (page = 1) => {
   loading.value = true
@@ -165,6 +167,15 @@ const debounceSearch = () => {
 const clearFilters = () => { Object.assign(filters, { category_id: '', search: '', min_price: '', max_price: '' }); fetchProducts(1) }
 
 onMounted(async () => {
+  // Check for search query in URL
+  if (route.query.search) {
+    filters.search = route.query.search
+  }
+  // Check for category in URL
+  if (route.query.category) {
+    filters.category_id = route.query.category
+  }
+  
   const { data } = await axios.get('/categories')
   categories.value = data
   fetchProducts()

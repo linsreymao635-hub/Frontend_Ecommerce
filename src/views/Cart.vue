@@ -50,10 +50,13 @@
           <span>Subtotal</span><span>${{ total.toFixed(2) }}</span>
         </div>
         <div style="display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid var(--border);">
+          <span>Tax (10%)</span><span>${{ (total * 0.1).toFixed(2) }}</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid var(--border);">
           <span>Shipping</span><span style="color:var(--success);">Free</span>
         </div>
         <div style="display:flex; justify-content:space-between; padding-top:12px; font-size:1.1rem; font-weight:700;">
-          <span>Total</span><span>${{ total.toFixed(2) }}</span>
+          <span>Total</span><span>${{ (total * 1.1).toFixed(2) }}</span>
         </div>
         <router-link to="/checkout" class="btn btn-primary" style="width:100%; justify-content:center; margin-top:16px;">
           Proceed to Checkout

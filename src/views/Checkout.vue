@@ -12,8 +12,14 @@
           <span>{{ item.product?.name }} × {{ item.quantity }}</span>
           <span>${{ (item.product?.price * item.quantity).toFixed(2) }}</span>
         </div>
-        <div style="display:flex; justify-content:space-between; font-weight:700; padding-top:12px;">
-          <span>Total</span><span>${{ cartTotal.toFixed(2) }}</span>
+        <div style="display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid var(--border);">
+          <span>Subtotal</span><span>${{ cartTotal.toFixed(2) }}</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid var(--border);">
+          <span>Tax (10%)</span><span>${{ (cartTotal * 0.1).toFixed(2) }}</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; font-weight:700; padding-top:12px; font-size:1.1rem;">
+          <span>Total</span><span>${{ (cartTotal * 1.1).toFixed(2) }}</span>
         </div>
       </div>
       <div class="card card-body">
@@ -25,7 +31,7 @@
         </div>
         <button class="btn btn-primary btn-lg" style="width:100%; justify-content:center;"
           :disabled="loading || !address" @click="placeOrder">
-          {{ loading ? 'Placing Order...' : `Place Order — $${cartTotal.toFixed(2)}` }}
+          {{ loading ? 'Placing Order...' : `Place Order — $${(cartTotal * 1.1).toFixed(2)}` }}
         </button>
       </div>
     </template>
