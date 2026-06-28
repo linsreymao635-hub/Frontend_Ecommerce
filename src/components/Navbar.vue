@@ -68,8 +68,7 @@ const featuredProducts = computed(() => store.getters.products)
 const loadingProducts = computed(() => store.getters.productsLoading)
 
 onMounted(async () => {
-  // Only fetch if products not already cached
-  if (featuredProducts.value.length === 0 && !loadingProducts.value) {
+  if (!loadingProducts.value) {
     await store.dispatch('fetchProducts', 5)
   }
 })
@@ -92,7 +91,6 @@ const handleLogout = async () => {
 .dropdown { position: relative; }
 .dropdown-toggle { color: var(--text); text-decoration: none; font-weight: 500; cursor: pointer; }
 .dropdown-toggle:hover { color: var(--primary); }
-.dropdown { position: relative; }
 .dropdown-menu { display: none; position: absolute; top: 110%; left: 0; background: white; box-shadow: var(--shadow-xl); border-radius: var(--radius); min-width: 320px; padding: 12px; z-index: 200; border: 1px solid var(--border); max-height: 500px; overflow-y: auto; }
 .dropdown:hover .dropdown-menu { display: block; animation: fadeIn .2s ease; }
 .dropdown-menu a { display: block; padding: 10px 20px; color: var(--text); text-decoration: none; font-size: .9rem; }

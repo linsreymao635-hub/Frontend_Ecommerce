@@ -75,19 +75,20 @@ export default createStore({
         commit('SET_WISHLIST_COUNT', 0)
       }
     },
-    async fetchProducts({ commit }, perPage = 5) {
-      if (commit) commit('SET_PRODUCTS_LOADING', true)
+async fetchProducts({ commit }, perPage = 5) {
+      commit('SET_PRODUCTS_LOADING', true)
       try {
         const { data } = await api.get('/products', {
           params: { per_page: perPage }
         })
-        if (commit) commit('SET_PRODUCTS', data.data)
+        commit('SET_PRODUCTS', data.data)
         return data.data
       } catch (error) {
         console.error('Error fetching products:', error)
+        commit('SET_PRODUCTS', [])
         return []
       } finally {
-        if (commit) commit('SET_PRODUCTS_LOADING', false)
+        commit('SET_PRODUCTS_LOADING', false)
       }
     },
   },

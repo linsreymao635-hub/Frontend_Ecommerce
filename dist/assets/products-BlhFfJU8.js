@@ -1,0 +1,1 @@
+import{a as r}from"./index-CcB7F1xI.js";const o={getAll(e={}){return r.get("/products",{params:e})},getById(e){return r.get(`/products/${e}`)},getByCategory(e){return r.get("/products",{params:{category_id:e}})},getReviews(e){return r.get(`/products/${e}/reviews`)},addReview(e,t){return r.post(`/products/${e}/reviews`,t)}};export{o as p};

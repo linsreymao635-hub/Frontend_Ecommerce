@@ -56,7 +56,7 @@
 import { ref, onMounted, reactive } from 'vue'
 import { useRoute } from 'vue-router'
 import { useRouter } from 'vue-router'
-import axios from 'axios'
+import api from '../services/api'
 import ProductCard from '../components/ProductCard.vue'
 const route       = useRoute()
 const router      = useRouter()
@@ -71,9 +71,13 @@ const fetchProducts = async (page = 1) => {
   loading.value = true
   const params  = { page, ...filters }
   Object.keys(params).forEach(k => !params[k] && delete params[k])
-  const { data } = await axios.get('/products', { params })
-  products.value   = data.data
-  pagination.value = { total: data.total, last_page: data.last_page, current_page: data.current_page }
+  try {
+    const { data } = await api.get('/products', { params })
+    products.value   = data.data
+    pagination.value = { total: data.total, last_page: data.last_page, current_page: data.current_page }
+  } catch (error) {
+    console.error('Error fetching products:', error)
+  }
   loading.value    = false
 }
 
@@ -98,9 +102,9 @@ onMounted(async () => {
     filters.category_id = route.query.category
   }
   
-  const { data } = await axios.get('/categories')
-  categories.value = data
-  fetchProducts()
+const { data } = await api.get('/categories')
+   categories.value = data
+   fetchProducts()
 })
 </script>
 

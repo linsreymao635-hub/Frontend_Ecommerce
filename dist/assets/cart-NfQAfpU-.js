@@ -1,0 +1,1 @@
+import{a as t}from"./index-CcB7F1xI.js";const c={getAll(){return t.get("/cart")},addToCart(r,e=1){return t.post("/cart",{product_id:r,quantity:e})},updateQuantity(r,e){return t.put(`/cart/${r}`,{quantity:e})},removeFromCart(r){return t.delete(`/cart/${r}`)},clearCart(){return t.delete("/cart")}};export{c};

@@ -1,0 +1,1 @@
+import{a as i}from"./index-CcB7F1xI.js";const e={getAll(){return i.get("/wishlist")},addToWishlist(t){return i.post("/wishlist",{product_id:t})},removeFromWishlist(t){return i.delete(`/wishlist/${t}`)}};export{e as w};
