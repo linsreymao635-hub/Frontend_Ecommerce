@@ -2,37 +2,13 @@
   <div class="container">
     <div class="page-header">
     </div>
-    <div class="products-layout">
-      <!-- Sidebar filter -->
-      <aside class="filters">
-        <h3>Filters</h3>
-        <div class="filter-group">
-          <label>Category</label>
-          <select v-model="filters.category_id" class="form-select" @change="fetchProducts(1)">
-            <option value="">All Categories</option>
-            <option v-for="c in categories" :key="c.id" :value="c.id">{{ c.name }}</option>
-          </select>
-        </div>
-        <div class="filter-group">
-          <label>Search</label>
-          <input v-model="filters.search" class="form-control" placeholder="Search..." @input="debounceSearch">
-        </div>
-        <div class="filter-group">
-          <label>Min Price</label>
-          <input v-model="filters.min_price" type="number" class="form-control" @change="fetchProducts(1)">
-        </div>
-        <div class="filter-group">
-          <label>Max Price</label>
-          <input v-model="filters.max_price" type="number" class="form-control" @change="fetchProducts(1)">
-        </div>
-        <button class="btn btn-secondary btn-sm w-100" @click="clearFilters">Clear Filters</button>
-      </aside>
-
-      <!-- Products grid -->
-      <div class="products-main">
+    <div class="products-main">
         <div v-if="loading" class="loading-center"><div class="spinner"></div></div>
         <template v-else>
-          <p class="results-count">{{ pagination.total }} products found</p>
+          <p class="results-count">
+            <span v-if="searchQuery">Search results for "{{ searchQuery }}" ({{ pagination.total }} products)</span>
+            <span v-else>{{ pagination.total }} products found</span>
+          </p>
           <div class="product-grid">
             <ProductCard 
               v-for="p in products" 
@@ -47,13 +23,12 @@
                     :class="{ active: p === pagination.current_page }" @click="fetchProducts(p)">{{ p }}</button>
           </div>
         </template>
-      </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, reactive } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useRouter } from 'vue-router'
 import api from '../services/api'
@@ -61,17 +36,17 @@ import ProductCard from '../components/ProductCard.vue'
 const route       = useRoute()
 const router      = useRouter()
 const products    = ref([])
-const categories  = ref([])
 const loading     = ref(true)
-const filters     = reactive({ category_id: '', search: '', min_price: '', max_price: '' })
 const pagination  = ref({})
-let searchTimer   = null
+const searchQuery = ref('')
 
 const fetchProducts = async (page = 1) => {
   loading.value = true
-  const params  = { page, ...filters }
-  Object.keys(params).forEach(k => !params[k] && delete params[k])
   try {
+    const params = { page }
+    if (searchQuery.value) {
+      params.search = searchQuery.value
+    }
     const { data } = await api.get('/products', { params })
     products.value   = data.data
     pagination.value = { total: data.total, last_page: data.last_page, current_page: data.current_page }
@@ -81,40 +56,87 @@ const fetchProducts = async (page = 1) => {
   loading.value    = false
 }
 
-const debounceSearch = () => {
-  clearTimeout(searchTimer)
-  searchTimer = setTimeout(() => fetchProducts(1), 400)
-}
-
-const clearFilters = () => { Object.assign(filters, { category_id: '', search: '', min_price: '', max_price: '' }); fetchProducts(1) }
-
 const viewProduct = (id) => {
   router.push(`/products/${id}`)
 }
 
+// Watch for search query changes in URL
+watch(() => route.query.search, (newSearch) => {
+  searchQuery.value = newSearch || ''
+  fetchProducts(1)
+})
+
 onMounted(async () => {
   // Check for search query in URL
   if (route.query.search) {
-    filters.search = route.query.search
+    searchQuery.value = route.query.search
   }
-  // Check for category in URL
-  if (route.query.category) {
-    filters.category_id = route.query.category
-  }
-  
-const { data } = await api.get('/categories')
-   categories.value = data
-   fetchProducts()
+  fetchProducts()
 })
 </script>
 
 <style scoped>
-.products-layout { display: grid; grid-template-columns: 220px 1fr; gap: 28px; }
-.filters { background: white; border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow); height: fit-content; position: sticky; top: 80px; }
-.filters h3 { font-size: 1rem; font-weight: 700; margin-bottom: 16px; }
-.filter-group { margin-bottom: 16px; }
-.filter-group label { display: block; font-size: .85rem; font-weight: 500; margin-bottom: 5px; color: var(--text-light); }
-.w-100 { width: 100%; }
-.results-count { color: var(--text-light); font-size: .9rem; margin-bottom: 16px; }
-@media(max-width:768px){ .products-layout { grid-template-columns: 1fr; } .filters { position: static; } }
+.products-main {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.results-count {
+  color: var(--text-light);
+  font-size: 1rem;
+  font-weight: 500;
+  margin-bottom: 24px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--border);
+}
+
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 24px;
+  margin-bottom: 40px;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 20px 0;
+}
+
+.page-btn {
+  min-width: 40px;
+  height: 40px;
+  padding: 0 12px;
+  border: 1px solid var(--border);
+  background: white;
+  color: var(--text-color);
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.page-btn:hover {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.page-btn.active {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+@media (max-width: 768px) {
+  .product-grid {
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 16px;
+  }
+}
 </style>

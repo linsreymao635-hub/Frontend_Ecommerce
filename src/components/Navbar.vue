@@ -2,6 +2,18 @@
   <nav class="navbar">
     <div class="container nav-inner">
       <router-link to="/" class="nav-brand">🛒 ShopVue</router-link>
+      <div class="nav-search">
+        <input 
+          v-model="searchQuery" 
+          type="text" 
+          placeholder="Search products..." 
+          class="search-input"
+          @keyup.enter="handleSearch"
+        />
+        <button class="search-btn" @click="handleSearch">
+          🔍
+        </button>
+      </div>
       <div class="nav-links">
         <router-link to="/">Home</router-link>
         <div class="dropdown">
@@ -73,6 +85,16 @@ onMounted(async () => {
   }
 })
 
+const searchQuery = ref('')
+
+const handleSearch = () => {
+  if (searchQuery.value.trim()) {
+    router.push({ path: '/products', query: { search: searchQuery.value } })
+  } else {
+    router.push('/products')
+  }
+}
+
 const handleLogout = async () => {
   await store.dispatch('logout')
   router.push('/login')
@@ -83,6 +105,38 @@ const handleLogout = async () => {
 .navbar { background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.1); position: sticky; top: 0; z-index: 100; }
 .nav-inner { display: flex; align-items: center; justify-content: space-between; height: 64px; }
 .nav-brand { font-size: 1.4rem; font-weight: 700; color: var(--primary); text-decoration: none; }
+.nav-search { display: flex; align-items: center; gap: 8px; margin-right: 16px; }
+.search-input { 
+  padding: 8px 16px; 
+  border: 1px solid var(--border); 
+  border-radius: 20px; 
+  font-size: 0.9rem; 
+  width: 200px; 
+  transition: all 0.2s;
+  outline: none;
+}
+.search-input:focus { 
+  border-color: var(--primary); 
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  width: 240px;
+}
+.search-btn { 
+  background: var(--primary); 
+  color: white; 
+  border: none; 
+  border-radius: 50%; 
+  width: 36px; 
+  height: 36px; 
+  cursor: pointer; 
+  display: flex; 
+  align-items: center; 
+  justify-content: center;
+  transition: all 0.2s;
+}
+.search-btn:hover { 
+  background: var(--primary-dark); 
+  transform: scale(1.05);
+}
 .nav-links { display: flex; align-items: center; gap: 20px; }
 .nav-links a { color: var(--text); text-decoration: none; font-weight: 500; transition: color .2s; }
 .nav-links a:hover, .nav-links a.router-link-active { color: var(--primary); }

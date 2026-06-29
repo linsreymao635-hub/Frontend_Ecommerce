@@ -1,7 +1,7 @@
 <template>
   <footer class="footer">
     <div class="container">
-      <p>© 2024 ShopVue — Built with Laravel + Vue.js</p>
+      <p>© 2026 ShopVue — Built by AI</p>
     </div>
   </footer>
 </template>
